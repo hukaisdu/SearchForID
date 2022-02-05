@@ -1,7 +1,7 @@
 #include"basic.h"
 #include"forword.h"
 #include"backword.h"
-#include"skinny.h"
+#include"craft.h"
 
 #include<set>
 #include<vector>
