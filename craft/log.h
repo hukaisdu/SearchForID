@@ -28,9 +28,10 @@ inline string getCurrentSystemTime(TIMETYPE type)
 inline void logger( string logMsg = "\n", ostream & os = cout )
 {
     //string filePath = "LOG/log_" + getCurrentSystemTime( DATE ) + ".log"; 
+    string date = getCurrentSystemTime(DATE);
     string now = getCurrentSystemTime(TIME);
     //ofstream os ( filePath.c_str(), ios_base::out | ios_base::app ); 
-    os << now << "\t" << logMsg << "\n";
+    os << date << " " << now << "\t" << logMsg << "\n" << flush;
     //os.close();
 }
 

@@ -2,7 +2,7 @@ OPT= -std=c++17 -O3 -m64 -lm -lpthread
 #GUROBI_HEAD= -I /Library/gurobi912/mac64/include
 GUROBI_HEAD= -I $(GUROBI_HOME)/include
 #GUROBI_LIB= -L /Library/gurobi912/mac64/lib -lgurobi_c++ -lgurobi91
-GUROBI_LIB= -L $(GUROBI_HOME)/lib -lgurobi_c++ -lgurobi91
+GUROBI_LIB= -L $(GUROBI_HOME)/lib -lgurobi_c++ -lgurobi95
 
 all: main_debugger main_automatic
 

@@ -71,10 +71,14 @@ int SKINNY( int r, const NS & in, const set<NS> &out,
     // generate model
     try 
     { 
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+
+        env.set(GRB_IntParam_OutputFlag, 0);
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
-        GRBModel model = GRBModel(env);
+        env.start();
+
+        GRBModel model = GRBModel( env );
 
         // generate variables
         vector<GRBVar*> X;
@@ -187,13 +191,18 @@ int SKINNY_MultiSolution( int r, const NS & in, const NS & out, set< pair<NS,
     // generate model
     try 
     { 
-        GRBEnv env = GRBEnv();
+
+        GRBEnv env = GRBEnv( true );
+
+        env.set(GRB_IntParam_OutputFlag, 0);
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
+
         // solution pool
         env.set(GRB_IntParam_PoolSearchMode, 2); 
         env.set(GRB_IntParam_PoolSolutions, 100); 
 
+        env.start();
         random_device rd;
         mt19937_64 generator ( rd() );
     
@@ -326,10 +335,14 @@ int SKINNY_Single( int r, const NS & in, const NS & out, NS & START, NS & END )
     // generate model
     try 
     { 
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv ( true );
+
+
+        env.set(GRB_IntParam_OutputFlag, 0);
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
 
+        env.start();
         //random_device rd;
 
         //mt19937_64 generator ( rd() );
@@ -456,9 +469,15 @@ int SKINNY_Truncated( int r, const NS & inx, const NS & outx )
     // generate model
     try 
     { 
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
+
+        env.start();
+
         GRBModel model = GRBModel(env);
 
         // generate variables

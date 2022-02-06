@@ -1,7 +1,7 @@
 #include"gurobi_c++.h"
 #include"forword.h"
 #include"backword.h"
-#include"skinny.h"
+#include"craft.h"
 #include"basic.h"
 #include"log.h"
 #include<iostream>
@@ -14,7 +14,6 @@
 #include<cstdio>
 #include<cmath>
 #include"automatic.h"
-#include"manual.h"
 #include<map>
 
 using namespace std;

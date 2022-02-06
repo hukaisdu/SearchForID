@@ -128,12 +128,12 @@ int main()
     set<Word> seed0 { 0 };
 
     frontIS0 = seedf;
-    frontIS1 = seedf;
+    frontIS1 = seed0;
     frontIS2 = seed0;
     frontIS3 = seed0;
 
     backIS0 = seedb;
-    backIS1 = seedb;
+    backIS1 = seed0;
     backIS2 = seed0;
     backIS3 = seed0;
 
