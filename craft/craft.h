@@ -1,5 +1,5 @@
-#ifndef __SKINNY_H__
-#define __SKINNY_H__
+#ifndef __CRAFT_H__
+#define __CRAFT_H__
 
 #include"basic.h"
 

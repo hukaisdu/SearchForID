@@ -27,7 +27,7 @@ void Worker( const set<NS> & Head,  const set<NS> & Tail, set< pair<NS, NS> > & 
 {
     for ( auto& it : Head )
     {
-        auto res = SKINNY( ROUND - 4, it, Tail, Bad );
+        auto res = CRAFT( ROUND - 4, it, Tail, Bad );
         if ( res < 0 )
         {
             cerr << "Error " << endl;
@@ -722,7 +722,7 @@ int processBadPattern ( pair<NS, NS> & badPattern,
     set < pair<NS, NS> > PIN;
     PIN.clear();
 
-    auto res = SKINNY_MultiSolution( ROUND, pxx, pyy, PIN );
+    auto res = CRAFT_MultiSolution( ROUND, pxx, pyy, PIN );
         
     cout << dec << "Res = " << res << " Solution IN size : " << PIN.size() << endl;
 
@@ -780,7 +780,7 @@ int processBadPattern ( pair<NS, NS> & badPattern,
 
 
         pair<NS, NS> inner;
-        auto res = SKINNY_Single( ROUND, d.first, d.second, inner.first,
+        auto res = CRAFT_Single( ROUND, d.first, d.second, inner.first,
                 inner.second );
 
         if ( res == 0 ) // infeasible
@@ -800,7 +800,7 @@ int processBadPattern ( pair<NS, NS> & badPattern,
                     t.second[i] = 1;
 
             // check if truncated ID
-            auto isTruncated = SKINNY_Truncated( ROUND, t.first, t.second );
+            auto isTruncated = CRAFT_Truncated( ROUND, t.first, t.second );
 
             if ( isTruncated == 0 ) // ID
             {

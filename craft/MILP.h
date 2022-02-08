@@ -27,14 +27,14 @@ void ModelMC( GRBModel & model,
 void SR( GRBVar * p );
 */
 
-int SKINNY( int r, const NS & inx, const std::set<NS> &outx, std::set<
+int CRAFT( int r, const NS & inx, const std::set<NS> &outx, std::set<
         std::pair<NS, NS> > & bad );
 
-int SKINNY_Single( int r, const NS &,  const NS &outx, NS &, NS & );
+int CRAFT_Single( int r, const NS &,  const NS &outx, NS &, NS & );
 
-int SKINNY_Truncated( int r, const NS & inx, const NS & outx );
+int CRAFT_Truncated( int r, const NS & inx, const NS & outx );
 
-int SKINNY_MultiSolution( int r, const NS & in, const NS &out, std::set< std::pair<NS,
+int CRAFT_MultiSolution( int r, const NS & in, const NS &out, std::set< std::pair<NS,
         NS > >  & );
 #endif
 

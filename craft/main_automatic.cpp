@@ -63,6 +63,7 @@ int main()
     Word PP[65536];
     for ( int i = 0; i < 65536; i++ )
         PP[i] = i;
+
     set<Word> P ( PP, PP + 65536 );
 
     set<pair<NS, NS>> badPattern;
@@ -70,6 +71,7 @@ int main()
     set<Word> frontIS0, frontIS1, frontIS2, frontIS3, backIS0, backIS1, backIS2,
         backIS3;
 
+    /*
     set<Word> tmpSeed0[THREAD];
 
     vector<thread> threads;
@@ -94,12 +96,16 @@ int main()
     for ( auto it : seed )
         cout << hex << int( it ) << " ";
     cout << endl;
+    */
 
-    frontIS0 = seed;
-    frontIS1 = seed;
-    frontIS2 = seed;
-    frontIS3 = seed;
+    set<Word> seedf { 0x0, 0x600, 0x3303, 0x5fe3, 0x6000, 0x9c00, 0xb0b0, 0xb430, 0xbd0c, 0xce3e }; 
 
+    frontIS0 = seedf;
+    frontIS1 = seedf;
+    frontIS2 = seedf;
+    frontIS3 = seedf;
+
+    /*
     set<Word> tmpSeed1[THREAD];
 
     threads.clear();
@@ -123,12 +129,14 @@ int main()
     for ( auto it : seed )
         cout << hex << int( it ) << " ";
     cout << endl;
+    */
 
+    set<Word> seedb { 0x0, 0xc00, 0x30b0, 0x3b0b, 0x594f, 0x6000, 0x9100, 0x9363, 0xb404, 0xb9b0 };
 
-    backIS0 = seed;
-    backIS1 = seed;
-    backIS2 = seed;
-    backIS3 = seed;
+    backIS0 = seedb;
+    backIS1 = seedb;
+    backIS2 = seedb;
+    backIS3 = seedb;
 
     getBadPatternX( frontIS0, frontIS1, frontIS2, frontIS3, backIS0, backIS1, backIS2,
             backIS3, 

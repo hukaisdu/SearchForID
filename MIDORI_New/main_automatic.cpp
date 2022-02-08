@@ -1,7 +1,7 @@
 #include"gurobi_c++.h"
 #include"forword.h"
 #include"backword.h"
-#include"skinny.h"
+#include"midori.h"
 #include"basic.h"
 #include"log.h"
 #include"automatic.h"
@@ -21,7 +21,7 @@ int ** Invtable;
 
 int main()
 {
-    ROUND = 7;
+    ROUND = 8;
     // generate DDT of the Sbox
     table =  new int* [16]; 
     for ( int i = 0; i < 16; i++ )
@@ -133,7 +133,7 @@ int main()
     frontIS3 = seed0;
 
     backIS0 = seedb;
-    backIS1 = seed0;
+    backIS1 = seedb;
     backIS2 = seed0;
     backIS3 = seed0;
 

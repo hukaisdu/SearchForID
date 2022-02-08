@@ -1,5 +1,5 @@
-#ifndef __SKINNY_H__
-#define __SKINNY_H__
+#ifndef __MIDORI_H__
+#define __MIDORI_H__
 
 #include"basic.h"
 

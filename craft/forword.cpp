@@ -1,6 +1,6 @@
 #include"basic.h" 
 #include"backword.h"
-#include"skinny.h"
+#include"craft.h"
 #include"forword.h"
 #include<iostream>
 #include<set>

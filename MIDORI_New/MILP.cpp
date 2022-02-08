@@ -65,7 +65,7 @@ void SR( GRBVar * p )
 }
 
 // we do not construct every model for each (a, b), we rtemove some constraints to reuse the model
-int SKINNY( int r, const NS & in, const set<NS> &out,
+int MIDORI( int r, const NS & in, const set<NS> &out,
         set< pair<NS, NS> > & bad )
 {
     // generate model
@@ -182,7 +182,7 @@ int SKINNY( int r, const NS & in, const set<NS> &out,
         return 1;
 }
 
-int SKINNY_MultiSolution( int r, const NS & in, const NS & out, set< pair<NS,
+int MIDORI_MultiSolution( int r, const NS & in, const NS & out, set< pair<NS,
         NS > > & S )
 {
     BS inx, outx;
@@ -326,7 +326,7 @@ int SKINNY_MultiSolution( int r, const NS & in, const NS & out, set< pair<NS,
     return -1;
 }
 
-int SKINNY_Single( int r, const NS & in, const NS & out, NS & START, NS & END )
+int MIDORI_Single( int r, const NS & in, const NS & out, NS & START, NS & END )
 {
     BS inx, outx;
     Nibble_to_Bit( in, inx );
@@ -464,7 +464,7 @@ int SKINNY_Single( int r, const NS & in, const NS & out, NS & START, NS & END )
     return -1;
 }
 
-int SKINNY_Truncated( int r, const NS & inx, const NS & outx )
+int MIDORI_Truncated( int r, const NS & inx, const NS & outx )
 {
     // generate model
     try 

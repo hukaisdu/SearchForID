@@ -1,7 +1,7 @@
 #include"basic.h"
 #include"forword.h"
 #include"backword.h"
-#include"skinny.h"
+#include"midori.h"
 #include"log.h"
 
 #include<set>

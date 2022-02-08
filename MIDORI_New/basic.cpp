@@ -5,7 +5,7 @@
 #include<random>
 #include<iostream>
 #include<algorithm>
-#include"skinny.h"
+#include"midori.h"
 #include"automatic.h"
 #include"forword.h"
 #include"backword.h"

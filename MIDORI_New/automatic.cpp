@@ -1,7 +1,7 @@
 #include"gurobi_c++.h"
 #include"forword.h"
 #include"backword.h"
-#include"skinny.h"
+#include"midori.h"
 #include"basic.h"
 #include"log.h"
 #include<iostream>
@@ -28,7 +28,7 @@ void Worker( const set<NS> & Head,  const set<NS> & Tail, set< pair<NS, NS> > & 
 {
     for ( auto& it : Head )
     {
-        auto res = SKINNY( ROUND - 4, it, Tail, Bad );
+        auto res = MIDORI( ROUND - 4, it, Tail, Bad );
         if ( res < 0 )
         {
             cerr << "Error " << endl;
@@ -743,7 +743,7 @@ int processBadPattern ( pair<NS, NS> & badPattern,
     set < pair<NS, NS> > PIN;
     PIN.clear();
 
-    auto res = SKINNY_MultiSolution( ROUND, pxx, pyy, PIN );
+    auto res = MIDORI_MultiSolution( ROUND, pxx, pyy, PIN );
         
     cout << dec << "Res = " << res << " Solution IN size : " << PIN.size() << endl;
 
@@ -827,7 +827,7 @@ int processBadPattern ( pair<NS, NS> & badPattern,
         MC( d.second );
 
         pair<NS, NS> inner;
-        auto res = SKINNY_Single( ROUND, d.first, d.second, inner.first,
+        auto res = MIDORI_Single( ROUND, d.first, d.second, inner.first,
                 inner.second );
 
         if ( res == 0 ) // infeasible
@@ -850,7 +850,7 @@ int processBadPattern ( pair<NS, NS> & badPattern,
                     t.second[i] = 1;
 
             // check if truncated ID
-            auto isTruncated = SKINNY_Truncated( ROUND, t.first, t.second );
+            auto isTruncated = MIDORI_Truncated( ROUND, t.first, t.second );
 
             if ( isTruncated == 0 ) // ID
             {
