@@ -71,9 +71,10 @@ int main()
     set<Word> P ( PP, PP + 16 );
 
     set<Word> seed;
+
     getPatterns( P, seed );
 
-    cout << "Seed size" << seed.size() << endl;
+    cout << "Seed size : " << seed.size() << endl;
 
     for ( auto it : seed )
         cout << hex << int ( it ) << endl; 
@@ -176,14 +177,9 @@ int main()
 
     for ( auto it : impossible )
     {
-        printS( it.first, os );
-        os << endl;
+        printNibbleState( it.first, os );
         os << " --/--> ";
-
-        os << endl;
-        printS( it.second, os );
-        os << endl;
-
+        printNibbleState( it.second, os );
         os << endl;
     }
 

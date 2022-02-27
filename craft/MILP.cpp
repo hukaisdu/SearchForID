@@ -71,8 +71,9 @@ int CRAFT( int r, const NS & in, const set<NS> &out,
     // generate model
     try 
     { 
-        GRBEnv env = GRBEnv( true );
-        env.set( GRB_IntParam_OutputFlag, 0 );
+        //GRBEnv env = GRBEnv( true );
+        GRBEnv env = GRBEnv( false );
+        //env.set( GRB_IntParam_OutputFlag, 0 );
 
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
@@ -147,10 +148,11 @@ int CRAFT( int r, const NS & in, const set<NS> &out,
             else
                 model.addConstr( XT[i] == 1 );
 
-
         vector<GRBConstr> R;
         for ( auto & it : out )
         {
+            //printNibbleState( it );
+            //cout << endl;
             BS jt;
             Nibble_to_Bit( it, jt );
 

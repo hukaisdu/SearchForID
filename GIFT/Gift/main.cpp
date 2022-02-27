@@ -75,8 +75,8 @@ set<pair<NS, NS>> getBadPatternSamples( string filename )
 
 int main()
 {
-    ROUND = 7;
-    THREAD_NUMBER = 64;
+    ROUND = 8;
+    THREAD_NUMBER = 80;
     // generate DDT of the Sbox
 
     table =  new int* [16]; 
@@ -112,7 +112,8 @@ int main()
         PP[i] = i;
     set<Word> P ( PP, PP + 65536 );
 
-    set<pair<NS, NS>> badPattern = getBadPatternSamples( "badPattern.txt" );
+    //set<pair<NS, NS>> badPattern = getBadPatternSamples( "badPattern.txt" );
+    set<pair<NS, NS>> badPattern;
 
     set<Word> frontIS0; 
     set<Word> frontIS1; 
@@ -199,7 +200,7 @@ int main()
     set<Word> seedB { 0, 0xec, 0xd90, 0xe0f, 0x9b7b, 0xcd7e, 0xe00f, 0xe7cf,
         0xfdd7  };
 
-    //set<Word> seed0 { 0 };
+    set<Word> seed0 { 0 };
 
     frontIS0 = seedF;
     frontIS1 = seedF;
@@ -211,12 +212,9 @@ int main()
     backIS2 = seedB;
     backIS3 = seedB;
 
-    /*
     getBadPatternX( frontIS0, frontIS1, frontIS2, frontIS3, backIS0, backIS1, backIS2,
             backIS3, 
             badPattern );
-        */
-
 
     map<Word, set<Word> > MapFront0;
     InitializeMapFront( frontIS0, Invtable, MapFront0, P);

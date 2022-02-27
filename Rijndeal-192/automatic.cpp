@@ -76,7 +76,7 @@ void getBadPattern(  set<Word> & frontIS0,
     }
 
     cout << "Remove " << dec<< Head.size() << endl;
-    RemoveSymmetry( Head );
+    //RemoveSymmetry( Head );
     cout << "Remove " << dec << Head.size() << endl;
 
     for ( auto & it0 : backIS0 )

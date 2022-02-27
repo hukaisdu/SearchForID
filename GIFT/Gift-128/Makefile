@@ -4,12 +4,6 @@ GUROBI_LIB= -L $(GUROBI_HOME)/lib -lgurobi_c++ -lgurobi95
 
 all: main
 
-verify: verify.o MILP.o basic.o forword.o backword.o gift.o
-	g++ -o $@ $^ $(OPT) $(GUROBI_HEAD) $(GUROBI_LIB) -o verify
-
-verify.o: verify.cpp
-	g++ -c verify.cpp $(GUROBI_HEAD) -o verify.o
-
 main: main.o basic.o gift.o forword.o backword.o MILP.o automatic.o
 	g++ -o $@ $^ $(OPT) $(GUROBI_HEAD) $(GUROBI_LIB)  
 

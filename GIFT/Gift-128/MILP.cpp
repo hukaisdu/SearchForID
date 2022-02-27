@@ -49,15 +49,15 @@ int SboxIneq[][9] = {
     {2, 1, 1, -1, -1, 0, 1, 1, -1}
 };
 
-int Perm2[16] = { 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15 };
+int Perm2[32] = { 0,8,16,24,1,9,17,25,2,10,18,26,3,11,19,27, 4,12,20,28,5,13,21,29,6,14,22,30,7,15,23,31 };
 
 void P2( GRBVar * p ) 
 {
-    GRBVar tmp[64];
-    for ( int i = 0; i < 64; i++ )
+    GRBVar tmp[128];
+    for ( int i = 0; i < 128; i++ )
         tmp[i] = p[i];
 
-    for ( int i = 0; i < 16; i++ )
+    for ( int i = 0; i < 32; i++ )
         for ( int j = 0; j < 4; j++ )
             p[4 * i + j] = tmp[ Perm2[i] * 4 + j ];
 }
@@ -66,8 +66,8 @@ int Perm1[16] = { 12,1,6,11,8,13,2,7,4,9,14,3,0,5,10,15 };
 
 void P1( GRBVar * p ) 
 {
-    GRBVar tmp[64];
-    for ( int i = 0; i < 64; i++ )
+    GRBVar tmp[128];
+    for ( int i = 0; i < 128; i++ )
         tmp[i] = p[i];
 
     for ( int i = 0; i < 16; i++ )
@@ -76,6 +76,10 @@ void P1( GRBVar * p )
         p[16 + i] = tmp[ 16 + Perm1[i] ];
         p[32 + i] = tmp[ 32 + Perm1[i] ];
         p[48 + i] = tmp[ 48 + Perm1[i] ];
+        p[64 + i] = tmp[ 64 + Perm1[i] ];
+        p[80 + i] = tmp[ 80 + Perm1[i] ];
+        p[96 + i] = tmp[ 96 + Perm1[i] ];
+        p[112 + i] = tmp[ 112 + Perm1[i] ];
     }
 
 }
@@ -95,12 +99,12 @@ void ModelSbox( GRBModel & model,
 
 void BitPermF ( GRBVar* p )
 {
-    GRBVar tmp[64];
-    for ( int i = 0; i < 64; i++ )
+    GRBVar tmp[128];
+    for ( int i = 0; i < 128; i++ )
         tmp[i] = p[i];
 
-    for ( int i = 0; i < 64; i++ )
-        p[ 63 - BitPerm[i] ] = tmp[ 63 - i ];
+    for ( int i = 0; i < 128; i++ )
+        p[ 127 - BitPerm[i] ] = tmp[ 127 - i ];
 }
 
 void GIFT_Inner_Round( int r, const NS & inx, const set<NS> & outx, set<
@@ -110,18 +114,25 @@ void GIFT_Inner_Round( int r, const NS & inx, const set<NS> & outx, set<
     // generate model
     try 
     {
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
         env.set( GRB_IntParam_MIPFocus, 1 );
+
+        env.start();
+
         GRBModel model = GRBModel(env);
+
 
         // generate variables
         vector<GRBVar*> X;
         for ( int i = 0; i < r + 1; i++ )
         {
-            GRBVar * p = new GRBVar[64];
-            for ( int j = 0; j < 64; j++ )
+            GRBVar * p = new GRBVar[128];
+            for ( int j = 0; j < 128; j++ )
                 p[j] = model.addVar( 0, 1, 0, GRB_BINARY );
             X.push_back( p );
         }
@@ -130,7 +141,7 @@ void GIFT_Inner_Round( int r, const NS & inx, const set<NS> & outx, set<
         BS inxx;
         Nibble_to_Bit( inx, inxx );
 
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
             if ( inxx[i] == 0 )
                 model.addConstr( X[0][i] == 0 );
             else
@@ -142,7 +153,7 @@ void GIFT_Inner_Round( int r, const NS & inx, const set<NS> & outx, set<
         for ( int i = 0; i < r; i++ )
         {
             // SBox
-            for ( int j = 0; j < 16; j++ )
+            for ( int j = 0; j < 32; j++ )
                 ModelSbox( model, X[i    ][4 * j], X[i    ][4 * j + 1], X[i    ][4 * j + 2], X[i    ][4 * j + 3], 
                                   X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
 
@@ -159,7 +170,7 @@ void GIFT_Inner_Round( int r, const NS & inx, const set<NS> & outx, set<
             R.clear();
 
             // set variable values
-            for ( int i = 0; i < 64; i++ )
+            for ( int i = 0; i < 128; i++ )
             {
 
                 if ( jtx[i] == 0 )
@@ -208,12 +219,16 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
     // generate model
     try 
     {
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
         // solution pool
         env.set(GRB_IntParam_PoolSearchMode, 2); 
         env.set(GRB_IntParam_PoolSolutions, 100 ); 
+
+        env.start();
 
         GRBModel model = GRBModel(env);
 
@@ -221,8 +236,8 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
         vector<GRBVar*> X;
         for ( int i = 0; i < r + 1; i++ )
         {
-            GRBVar * p = new GRBVar[64];
-            for ( int j = 0; j < 64; j++ )
+            GRBVar * p = new GRBVar[128];
+            for ( int j = 0; j < 128; j++ )
                 p[j] = model.addVar( 0, 1, 0, GRB_BINARY );
             X.push_back( p );
         }
@@ -231,17 +246,17 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
         BS inxx;
         Nibble_to_Bit( inx, inxx );
 
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
             if ( inxx[i] == 0 )
                 model.addConstr( X[0][i] == 0 );
             else
                 model.addConstr( X[0][i] == 1 );
 
-        vector<GRBVar> START(64);
-        vector<GRBVar> END(64);
+        vector<GRBVar> START(128);
+        vector<GRBVar> END(128);
 
         int i = 0;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -249,12 +264,12 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
         P1( X[i+1] );
 
         i = 1;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
 
-        for ( int j = 0; j < 64; j++ )
+        for ( int j = 0; j < 128; j++ )
             START[j] = X[i+1][j];
 
         P2( X[i+1] );
@@ -264,7 +279,7 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
         for ( int i = 2; i < r - 2; i++ )
         {
             // SBox
-            for ( int j = 0; j < 16; j++ )
+            for ( int j = 0; j < 32; j++ )
                 ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                                   X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                                   1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -275,10 +290,10 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
         // SBox
         i = r-2;
 
-        for ( int j = 0; j < 64; j++ )
+        for ( int j = 0; j < 128; j++ )
             END[j] = X[i][j];
 
-        for ( int j = 0; j < 16 j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -287,7 +302,7 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
 
         i = r - 1;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -296,7 +311,7 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
         BS jtx;
         Nibble_to_Bit( outx, jtx );
 
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
         {
             if ( jtx[i] == 0 )
                 model.addConstr( X[r][i] == 0 );
@@ -316,7 +331,7 @@ int GIFT_MultiSolution( int r, const NS & inx, const NS & outx, set< pair<NS,
             {
                 BS x, y;
                 model.set(GRB_IntParam_SolutionNumber, i );
-                for ( int i = 0; i < 64; i++ )
+                for ( int i = 0; i < 128; i++ )
                 {
                     x[i] = static_cast<Nibble> ( round ( START[i].get(
                                     GRB_DoubleAttr_Xn ) ) );
@@ -361,9 +376,13 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
     // generate model
     try 
     {
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
+
+        env.start();
 
         GRBModel model = GRBModel(env);
 
@@ -371,8 +390,8 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         vector<GRBVar*> X;
         for ( int i = 0; i < r + 1; i++ )
         {
-            GRBVar * p = new GRBVar[64];
-            for ( int j = 0; j < 64; j++ )
+            GRBVar * p = new GRBVar[128];
+            for ( int j = 0; j < 128; j++ )
                 p[j] = model.addVar( 0, 1, 0, GRB_BINARY );
             X.push_back( p );
         }
@@ -381,17 +400,17 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         BS inxx;
         Nibble_to_Bit( inx, inxx );
 
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
             if ( inxx[i] == 0 )
                 model.addConstr( X[0][i] == 0 );
             else
                 model.addConstr( X[0][i] == 1 );
 
-        vector<GRBVar> START(64);
-        vector<GRBVar> END(64);
+        vector<GRBVar> START(128);
+        vector<GRBVar> END(128);
 
         int i = 0;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -399,12 +418,12 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         P1( X[i+1] );
 
         i = 1;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
 
-        for ( int j = 0; j < 64; j++ )
+        for ( int j = 0; j < 128; j++ )
             START[j] = X[i+1][j];
 
         P2( X[i+1] );
@@ -414,7 +433,7 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         for ( int i = 2; i < r - 2; i++ )
         {
             // SBox
-            for ( int j = 0; j < 16; j++ )
+            for ( int j = 0; j < 32; j++ )
                 ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                                   X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                                   1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -425,10 +444,10 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         // SBox
         i = r-2;
 
-        for ( int j = 0; j < 64; j++ )
+        for ( int j = 0; j < 128; j++ )
             END[j] = X[i][j];
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -437,7 +456,7 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
 
         i = r - 1;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -447,7 +466,7 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         BS jtx;
         Nibble_to_Bit( outx, jtx );
 
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
         {
             if ( jtx[i] == 0 )
                 model.addConstr( X[r][i] == 0 );
@@ -463,7 +482,7 @@ int GIFT_Single( int r, const NS & inx, const NS & outx, NS & start, NS & end
         {
             BS x, y;
 
-            for ( int i = 0; i < 64; i++ )
+            for ( int i = 0; i < 128; i++ )
             {
                 x[i] = static_cast<Nibble> ( round ( START[i].get(
                                 GRB_DoubleAttr_X ) ) );
@@ -505,9 +524,13 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
     // generate model
     try 
     {
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
+
+        env.start();
 
         GRBModel model = GRBModel(env);
 
@@ -515,13 +538,13 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
         vector<GRBVar*> X;
         for ( int i = 0; i < r + 1; i++ )
         {
-            GRBVar * p = new GRBVar[64];
-            for ( int j = 0; j < 64; j++ )
+            GRBVar * p = new GRBVar[128];
+            for ( int j = 0; j < 128; j++ )
                 p[j] = model.addVar( 0, 1, 0, GRB_BINARY );
             X.push_back( p );
         }
 
-        for ( int i = 0; i < 16; i++ )
+        for ( int i = 0; i < 32; i++ )
             if ( inx[i] == 0 )
                 model.addConstr( X[0][4 * i] + X[0][4 * i + 1] + X[0][4 * i + 2]
                         + X[0][4
@@ -533,7 +556,7 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
 
 
         int i = 0;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -541,7 +564,7 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
         P1( X[i+1] );
 
         i = 1;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -553,7 +576,7 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
         for ( int i = 2; i < r - 2; i++ )
         {
             // SBox
-            for ( int j = 0; j < 16; j++ )
+            for ( int j = 0; j < 32; j++ )
                 ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                                   X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                                   1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -564,7 +587,7 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
         // SBox
         i = r-2;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -573,12 +596,12 @@ int GIFT_Truncated( int r, const NS & inx, const NS & outx )
 
         i = r - 1;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
 
-        for ( int i = 0; i < 16; i++ )
+        for ( int i = 0; i < 32; i++ )
             if ( outx[i] == 0 )
                 model.addConstr( X[r][4 * i] + X[r][4 * i + 1] + X[r][4 * i + 2]
                         + X[r][4
@@ -625,23 +648,26 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
     // generate model
     try 
     {
-        GRBEnv env = GRBEnv();
+        GRBEnv env = GRBEnv( true );
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
 
+        env.start();
         GRBModel model = GRBModel(env);
 
         // generate variables
         vector<GRBVar*> X;
         for ( int i = 0; i < r + 1; i++ )
         {
-            GRBVar * p = new GRBVar[64];
-            for ( int j = 0; j < 64; j++ )
+            GRBVar * p = new GRBVar[128];
+            for ( int j = 0; j < 128; j++ )
                 p[j] = model.addVar( 0, 1, 0, GRB_BINARY );
             X.push_back( p );
         }
 
-        for ( int i = 0; i < 16; i++ )
+        for ( int i = 0; i < 32; i++ )
             if ( inx[i] == 0 )
                 model.addConstr( X[0][4 * i] + X[0][4 * i + 1] + X[0][4 * i + 2]
                         + X[0][4
@@ -653,7 +679,7 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
 
 
         int i = 0;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -661,7 +687,7 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
         P1( X[i+1] );
 
         i = 1;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -673,7 +699,7 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
         for ( int i = 2; i < r - 2; i++ )
         {
             // SBox
-            for ( int j = 0; j < 16; j++ )
+            for ( int j = 0; j < 32; j++ )
                 ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                                   X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                                   1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -684,7 +710,7 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
         // SBox
         i = r-2;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -693,7 +719,7 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
 
         i = r - 1;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -701,7 +727,7 @@ int GIFT_PlaintextTruncated( int r, const NS & inx, const NS & outx )
 
         BS p;
         Nibble_to_Bit ( outx, p );
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
             if ( p[i] == 0 )
                 model.addConstr( X[r][i] == 0 );
             else
@@ -745,24 +771,28 @@ int GIFT_CiphertextTruncated( int r, const NS & inx, const NS & outx )
     try 
     {
         GRBEnv env = GRBEnv();
+        env.set( GRB_IntParam_OutputFlag, 0 );
+
+
         env.set(GRB_IntParam_LogToConsole, 0);
         env.set(GRB_IntParam_Threads, 1 );
 
+        env.start();
         GRBModel model = GRBModel(env);
 
         // generate variables
         vector<GRBVar*> X;
         for ( int i = 0; i < r + 1; i++ )
         {
-            GRBVar * p = new GRBVar[64];
-            for ( int j = 0; j < 64; j++ )
+            GRBVar * p = new GRBVar[128];
+            for ( int j = 0; j < 128; j++ )
                 p[j] = model.addVar( 0, 1, 0, GRB_BINARY );
             X.push_back( p );
         }
 
         BS p;
         Nibble_to_Bit ( inx, p );
-        for ( int i = 0; i < 64; i++ )
+        for ( int i = 0; i < 128; i++ )
             if ( p[i] == 0 )
                 model.addConstr( X[0][i] == 0 );
             else
@@ -770,7 +800,7 @@ int GIFT_CiphertextTruncated( int r, const NS & inx, const NS & outx )
 
 
         int i = 0;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -778,7 +808,7 @@ int GIFT_CiphertextTruncated( int r, const NS & inx, const NS & outx )
         P1( X[i+1] );
 
         i = 1;
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, 
                     X[i][4 * j],     X[i][4 * j + 1],     X[i][4 * j + 2],     X[i][4 * j + 3], 
                     X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i + 1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -790,7 +820,7 @@ int GIFT_CiphertextTruncated( int r, const NS & inx, const NS & outx )
         for ( int i = 2; i < r - 2; i++ )
         {
             // SBox
-            for ( int j = 0; j < 16; j++ )
+            for ( int j = 0; j < 32; j++ )
                 ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                                   X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                                   1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -801,7 +831,7 @@ int GIFT_CiphertextTruncated( int r, const NS & inx, const NS & outx )
         // SBox
         i = r-2;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
@@ -810,13 +840,13 @@ int GIFT_CiphertextTruncated( int r, const NS & inx, const NS & outx )
 
         i = r - 1;
 
-        for ( int j = 0; j < 16; j++ )
+        for ( int j = 0; j < 32; j++ )
             ModelSbox( model, X[i][4 * j], X[i][4 * j + 1], X[i][4 * j + 2], X[i][4 * j + 3], 
                               X[i + 1][4 * j], X[i + 1][4 * j + 1], X[i +
                               1][4 * j + 2], X[i + 1][4 * j + 3] ); 
 
 
-        for ( int i = 0; i < 16; i++ )
+        for ( int i = 0; i < 32; i++ )
             if ( outx[i] == 0 )
                 model.addConstr( X[0][4 * i] + X[0][4 * i + 1] + X[0][4 * i + 2]
                         + X[0][4

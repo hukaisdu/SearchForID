@@ -22,7 +22,7 @@ int ** Invtable;
 
 int main()
 {
-    ROUND = 13;
+    ROUND = 14;
 
     /*
     for ( int i = 0; i < 16; i++ ) 
@@ -99,6 +99,8 @@ int main()
     */
 
     set<Word> seedf { 0x0, 0x600, 0x3303, 0x5fe3, 0x6000, 0x9c00, 0xb0b0, 0xb430, 0xbd0c, 0xce3e }; 
+    //set<Word> seedf { 0x0, 0x600 }; 
+    //set<Word> seed0 { 0 };
 
     frontIS0 = seedf;
     frontIS1 = seedf;
@@ -132,6 +134,7 @@ int main()
     */
 
     set<Word> seedb { 0x0, 0xc00, 0x30b0, 0x3b0b, 0x594f, 0x6000, 0x9100, 0x9363, 0xb404, 0xb9b0 };
+
 
     backIS0 = seedb;
     backIS1 = seedb;
