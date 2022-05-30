@@ -147,22 +147,22 @@ int main()
     ThreadPool thread_pool{};
 
     vector<std::future<void>> futures;
-    for ( auto it : badPattern )
+    for ( auto & it : badPattern )
     {
         futures.emplace_back( thread_pool.Submit( 
-        processBadPattern, ref( it ),  
-                ref( MapFront0 ),
-                ref( MapFront1 ),
-                ref( MapFront2 ),
-                ref( MapFront3 ),
-                ref( MapFront4 ),
-                ref( MapFront5 ),
-                ref( MapBack0 ),
-                ref( MapBack1 ),
-                ref( MapBack2 ),
-                ref( MapBack3 ),
-                ref( MapBack4 ),
-                ref( MapBack5 ),
+        processBadPattern, it,  
+                cref( MapFront0 ),
+                cref( MapFront1 ),
+                cref( MapFront2 ),
+                cref( MapFront3 ),
+                cref( MapFront4 ),
+                cref( MapFront5 ),
+                cref( MapBack0 ),
+                cref( MapBack1 ),
+                cref( MapBack2 ),
+                cref( MapBack3 ),
+                cref( MapBack4 ),
+                cref( MapBack5 ),
                 ref( impossible ) ) );
     }
 

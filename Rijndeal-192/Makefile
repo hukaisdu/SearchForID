@@ -1,9 +1,11 @@
 OPT= -std=c++17 -O3 -m64 -lm -lpthread
-GUROBI_HEAD= -I $(GUROBI_HOME)/include
-GUROBI_LIB= -L $(GUROBI_HOME)/lib -lgurobi_c++ -lgurobi95
+#GUROBI_HEAD= -I $(GUROBI_HOME)/include
+#GUROBI_LIB= -L $(GUROBI_HOME)/lib -lgurobi_c++ -lgurobi95
 #OPT= -std=c++17 -g -m64 -lm -lpthread
-#GUROBI_HEAD= -I /Library/gurobi912/mac64/include
-#GUROBI_LIB= -L /Library/gurobi912/mac64/lib -lgurobi_c++ -lgurobi91
+#GUROBI_HEAD= -I /Library/gurobi951/mac64/include
+#GUROBI_LIB= -L /Library/gurobi951/mac64/lib -lgurobi_c++ -lgurobi95
+GUROBI_HEAD = -I /Library/gurobi951/macos_universal2/include
+GUROBI_LIB= -L /Library/gurobi951/macos_universal2/lib -lgurobi_c++ -lgurobi95
 
 all: main_automatic
 

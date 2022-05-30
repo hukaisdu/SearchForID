@@ -297,6 +297,7 @@ void processBadPattern ( const pair<NS, NS> & badPattern,
     SKINNY_M( ROUND, totalSet, imp) ;
 
     std::lock_guard<std::mutex> lck(mtx);
+
     for ( auto it : imp )
         impossible.insert( it );
 }
